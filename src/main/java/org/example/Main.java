@@ -1,8 +1,9 @@
 package org.example;
 
-import org.example.homework1.Car;
-import org.example.homework1.Type;
-import org.example.homework1.Word;
+import org.example.homework2.Car;
+import org.example.homework2.DriveLicense;
+import org.example.homework2.Owner;
+import org.example.homework2.Type;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -10,7 +11,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import java.util.List;
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
@@ -19,41 +20,29 @@ public class Main {
                 .build();
 
         Metadata metadata = new MetadataSources(serviceRegistry)
-                .addAnnotatedClass(Word.class)
+                .addAnnotatedClass(Owner.class)
+                .addAnnotatedClass(DriveLicense.class)
                 .addAnnotatedClass(Car.class)
                 .getMetadataBuilder()
                 .build();
         SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-        Word word = new Word("sun");
-        Word word1 = new Word("house");
-        Word word2 = new Word("book");
-        Word word3 = new Word("lake");
-        session.persist(word);
-        session.persist(word1);
-        session.persist(word2);
-        session.persist(word3);
-        List<Word> list = session.createQuery("select w from Word w", Word.class).list();
-        System.out.println(list);
-        session.getTransaction().commit();
-        session.beginTransaction();
-        Car car = new Car( "Tesla Model S", Type.Sedan, 670, 79999, 2022);
+        Owner owner1 = new Owner("Alexander", new DriveLicense("abc894130163"));
+        Owner owner2 = new Owner("Mary", new DriveLicense("hbd890352114"));
+        Owner owner3 = new Owner("John", Arrays.asList(new Car("Tesla Model S", Type.Sedan, 670, 79999, 2022)), new DriveLicense("mkl089243511"));
+        session.persist(owner1);
+        session.persist(owner2);
+        session.persist(owner3);
         Car car1 = new Car("Volkswagen Golf", Type.Hatchback, 288, 30000, 2020);
         Car car2 = new Car("BMW M4", Type.Coupe, 503, 72000, 2023);
-        Car car3 = new Car();
-        car3.setModel("Nissan Qashqai");
-        car3.setType(Type.Crossover);
-        car3.setPower(187);
-        car3.setPrice(27000);
-        car3.setYear(2019);
-        session.persist(car);
-        session.persist(car1);
-        session.persist(car2);
-        session.persist(car3);
-        List<Car> cars = session.createQuery("select car from Car car", Car.class).list();
-        System.out.println(cars);
+        Car car3 = new Car("Nissan Qashqai",Type.Crossover, 187, 27000, 2019);
+
+        owner2.setCars(Arrays.asList(car1, car2));
+        owner1.setCars(Arrays.asList(car3));
         session.getTransaction().commit();
+        session.createQuery("select o from Owner o", Owner.class).list().forEach(owner->System.out.println(owner.getCars()));
+        session.createQuery("select o from Owner o", Owner.class).list().forEach(owner->System.out.println(owner.getDriveLicense()));
         session.close();
         sessionFactory.close();
     }
