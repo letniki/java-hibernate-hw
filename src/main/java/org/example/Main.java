@@ -36,8 +36,7 @@ public class Main {
         session.persist(word3);
         List<Word> list = session.createQuery("select w from Word w", Word.class).list();
         System.out.println(list);
-        session.getTransaction().commit();
-        session.beginTransaction();
+        
         Car car = new Car( "Tesla Model S", Type.Sedan, 670, 79999, 2022);
         Car car1 = new Car("Volkswagen Golf", Type.Hatchback, 288, 30000, 2020);
         Car car2 = new Car("BMW M4", Type.Coupe, 503, 72000, 2023);
